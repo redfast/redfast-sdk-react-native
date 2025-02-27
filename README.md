@@ -1,5 +1,7 @@
 # Redfast React Native Example App
 
+Obtain a Redfast webflow token, a Redfast pulse app id and use id before prcoeed.
+
 ## Install Redfast react native SDK packages
 
 This is a local package installation manual. We may explore a private [npm registry](https://docs.npmjs.com/about-private-packages) solution in the future.
