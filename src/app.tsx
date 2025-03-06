@@ -3,30 +3,30 @@ import HomeScreen from './home';
 import MovieDetailScreen from './detail';
 import { NavigationContainer } from '@react-navigation/native';
 import {
-  PromotionAction_Init,
-  PromotionProvider,
-  usePromotion,
+  PromptAction_Init,
+  PromptProvider,
+  usePrompt,
 } from '@redfast/react-native-redfast';
 import React from 'react';
-import { PromotionManager } from '@redfast/react-native-redfast';
+import { PromptManager } from '@redfast/react-native-redfast';
 
 const Stack = createStackNavigator();
 
 const AppRoot: React.FC = () => {
-  const { dispatch } = usePromotion();
+  const { dispatch } = usePrompt();
   const [isReady, setReady] = React.useState(false);
 
   React.useEffect(() => {
     if (dispatch) {
-      const promotionMgr = new PromotionManager(
+      const promptMgr = new PromptManager(
         '<YOUR_PULSE_APP_ID>',
         '<YOUR_PULSE_USER_ID>'
       );
       const intervalId = setInterval(() => {
-        if (promotionMgr.isInitialized()) {
+        if (promptMgr.isInitialized()) {
           dispatch({
-            type: PromotionAction_Init,
-            data: promotionMgr,
+            type: PromptAction_Init,
+            data: promptMgr,
           });
           setReady(true);
           clearInterval(intervalId);
@@ -53,8 +53,8 @@ const AppRoot: React.FC = () => {
 
 export default function App() {
   return (
-    <PromotionProvider>
+    <PromptProvider>
       <AppRoot />
-    </PromotionProvider>
+    </PromptProvider>
   );
 }

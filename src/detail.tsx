@@ -3,8 +3,9 @@ import { useRoute } from '@react-navigation/native';
 import type { MovieDetailScreenRouteProp } from './types';
 import type { ImageURISource } from 'react-native';
 import React from 'react';
-import { usePromotion, displayPromotion } from '@redfast/react-native-redfast';
+import { usePrompt, displayPrompt } from '@redfast/react-native-redfast';
 import type { PathItem } from '@redfast/redfast-core';
+import { PathType } from '@redfast/redfast-core';
 
 const Separator = () => <View style={styles.separator} />;
 
@@ -44,30 +45,32 @@ export default function MovieDetailScreen() {
     },
   ]);
   const {
-    state: { promotionMgr },
-  } = usePromotion();
+    state: { promptMgr },
+  } = usePrompt();
   const [showModal, setShowModal] = React.useState(false);
   const [pathItem, setPathItem] = React.useState<PathItem>();
 
   React.useEffect(() => {
-    if (promotionMgr) {
+    if (promptMgr) {
       (async () => {
-        const { path, delaySeconds } =
-          await promotionMgr.onScreenChanged('genres');
-        if (path) {
-          setTimeout(() => {
-            setPathItem(path);
-            setShowModal(true);
-          }, delaySeconds);
+        let prompts = promptMgr.getPrompts(PathType.BOTTOM_BANNER);
+        console.log(JSON.stringify(prompts, null, 2));
+        prompts = await promptMgr.getTriggerablePrompts(
+          'genres',
+          '*',
+          PathType.ALL
+        );
+        console.log(JSON.stringify(prompts, null, 2));
+        if (prompts.length > 0) {
+          prompts[0]?.impression();
         }
       })();
     }
-  }, [promotionMgr]);
+  }, [promptMgr]);
 
   const onButtonClicked = async () => {
-    if (promotionMgr) {
-      const { path, delaySeconds } =
-        await promotionMgr.onButtonClicked('clickId');
+    if (promptMgr) {
+      const { path, delaySeconds } = await promptMgr.onButtonClicked('clickId');
       if (path) {
         setTimeout(() => {
           setPathItem(path);
@@ -94,7 +97,7 @@ export default function MovieDetailScreen() {
         renderItem={({ item: { image } }) => <Image source={image} />}
         ItemSeparatorComponent={Separator}
       />
-      {displayPromotion(showModal, pathItem, (result) => {
+      {displayPrompt(showModal, pathItem, (result) => {
         console.log(result);
         setShowModal(false);
       })}

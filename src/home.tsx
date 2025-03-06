@@ -13,17 +13,17 @@ import { getAllMovies } from './utils/webflow';
 import type { ImageURISource } from 'react-native';
 import {
   MyComponent,
-  usePromotion,
-  displayPromotion,
+  usePrompt,
+  displayPrompt,
+  displayInlines,
 } from '@redfast/react-native-redfast';
-import type { Inline } from '@redfast/react-native-redfast';
 import type { PathItem } from '@redfast/redfast-core';
 
 interface Row {
   id: string;
   type: string;
   orientation: string;
-  list: Movie[] | Inline[];
+  list: Movie[] | PathItem[];
 }
 
 const Separator = () => <View style={styles.separator} />;
@@ -76,92 +76,73 @@ const ImageRow = ({
 };
 
 export default function HomeScreen() {
-  const [movieRow1, setMovieRow1] = React.useState<Movie[]>([]);
-  const [movieRow2, setMovieRow2] = React.useState<Movie[]>([]);
-  const [inlines, setInlines] = React.useState<Inline[]>([]);
+  const [rowList, setRowList] = React.useState<Row[]>([]);
   const [showModal, setShowModal] = React.useState(false);
   const [pathItem, setPathItem] = React.useState<PathItem>();
 
   const {
-    state: { promotionMgr },
-  } = usePromotion();
+    state: { promptMgr },
+  } = usePrompt();
 
   React.useEffect(() => {
-    if (promotionMgr) {
+    if (promptMgr) {
       (async () => {
         const movies = await getAllMovies();
         const mid = Math.floor(movies.length / 2);
-        const subset1 = movies.slice(0, mid);
-        setMovieRow1(subset1);
-        const subset2 = movies.slice(mid);
-        setMovieRow2(subset2);
+        const movieRow1 = movies.slice(0, mid);
+        const movieRow2 = movies.slice(mid);
+        const inlines = (await promptMgr?.getInlines('android-banner')) ?? [];
+        const rows: Row[] = [];
+        if (inlines.length > 0) {
+          rows.push({
+            id: String(rows.length),
+            type: 'banner',
+            orientation: 'landscape',
+            list: inlines,
+          });
+        }
+        rows.push({
+          id: String(rows.length),
+          type: 'highlight',
+          orientation: 'landscape',
+          list: [require('../assets/highlightd.png')],
+        });
+        rows.push({
+          id: String(rows.length),
+          type: 'movie',
+          orientation: 'portrait',
+          list: movieRow1,
+        });
+        rows.push({
+          id: String(rows.length),
+          type: 'splash',
+          orientation: 'landscape',
+          list: [require('../assets/splash.png')],
+        });
+        rows.push({
+          id: String(rows.length),
+          type: 'new',
+          orientation: 'landscape',
+          list: [require('../assets/new-release.png')],
+        });
+        rows.push({
+          id: String(rows.length),
+          type: 'movie',
+          orientation: 'landscape',
+          list: movieRow2,
+        });
+        setRowList(rows);
 
-        const { path, delaySeconds } =
-          await promotionMgr.onScreenChanged('home');
+        const { path, delaySeconds } = await promptMgr.onScreenChanged('home');
         if (path) {
           setTimeout(() => {
             setPathItem(path);
             setShowModal(true);
           }, delaySeconds);
         }
-
-        const inlineObjs =
-          (await promotionMgr?.getInlines('android-banner')) ?? [];
-        setInlines(inlineObjs);
-        Promise.all(
-          inlineObjs.map((inline) => {
-            promotionMgr?.onInlineViewed(inline.id, inline.action_group_id);
-          })
-        );
       })();
     }
-  }, [promotionMgr]);
-
-  const [rowList, setRowList] = React.useState<Row[]>([]);
-  React.useEffect(() => {
-    if (movieRow1.length > 0 && movieRow2.length > 0) {
-      const rows: Row[] = [];
-      inlines.forEach((inline) => {
-        rows.push({
-          id: String(rows.length),
-          type: 'banner',
-          orientation: 'landscape',
-          list: [inline],
-        });
-      });
-      rows.push({
-        id: String(rows.length),
-        type: 'highligt',
-        orientation: 'landscape',
-        list: [require('../assets/highlightd.png')],
-      });
-      rows.push({
-        id: String(rows.length),
-        type: 'movie',
-        orientation: 'portrait',
-        list: movieRow1,
-      });
-      rows.push({
-        id: String(rows.length),
-        type: 'splash',
-        orientation: 'landscape',
-        list: [require('../assets/splash.png')],
-      });
-      rows.push({
-        id: String(rows.length),
-        type: 'new',
-        orientation: 'landscape',
-        list: [require('../assets/new-release.png')],
-      });
-      rows.push({
-        id: String(rows.length),
-        type: 'movie',
-        orientation: 'landscape',
-        list: movieRow2,
-      });
-      setRowList(rows);
-    }
-  }, [movieRow1, movieRow2, inlines]);
+  }, [promptMgr]);
 
   const { width: windowWidth } = useWindowDimensions();
 
@@ -180,20 +161,15 @@ export default function HomeScreen() {
                 />
               );
             case 'banner':
-              return (
-                <ImageRow
-                  image={{ uri: (item.list[0] as Inline).image_composite }}
-                  height={(windowWidth * 300) / 1026}
-                  callback={async () => {
-                    const inline = item.list[0] as Inline;
-                    promotionMgr?.onInlineClicked(
-                      inline.id,
-                      inline.action_group_id
-                    );
-                  }}
-                />
+              return displayInlines(
+                item.list as PathItem[],
+                (windowWidth * 300) / 1026,
+                (result) =>
+                  console.log(
+                    JSON.stringify({ ...result, source: 'banner' }, null, 2)
+                  )
               );
-            case 'highligt':
+            case 'highlight':
               return (
                 <ImageRow
                   image={item.list[0] as ImageURISource}
@@ -222,24 +198,24 @@ export default function HomeScreen() {
       />
       <TouchableOpacity
         onPress={async () => {
-          if (promotionMgr) {
+          if (promptMgr) {
             const { path, delaySeconds } =
-              await promotionMgr.onButtonClicked('clickId');
+              await promptMgr.onButtonClicked('clickId');
             if (path) {
               setTimeout(() => {
                 setPathItem(path);
                 setShowModal(true);
               }, delaySeconds);
             }
-            await promotionMgr.customTrack('genres');
-            await promotionMgr.resetGoal();
+            await promptMgr.customTrack('genres');
+            await promptMgr.resetGoal();
           }
         }}
       >
-        <MyComponent message="hello world" />
+        <MyComponent message="Reset Prompts" />
       </TouchableOpacity>
-      {displayPromotion(showModal, pathItem, (result) => {
-        console.log(result);
+      {displayPrompt(showModal, pathItem, (result) => {
+        console.log(JSON.stringify({ ...result, source: 'modal' }, null, 2));
         setShowModal(false);
       })}
     </View>

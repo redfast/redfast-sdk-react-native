@@ -27,6 +27,7 @@ npm install <YOUR_LOCAL_PATH_TO>/redfast-react-native-redfast-0.1.0.tgz
 <span style="color:yellow">**Not Important**</span> use either `npm` or `yarn` works
 
 ```bash
+nvm use 18.18
 npm run start
 // or yarn start
 ```
