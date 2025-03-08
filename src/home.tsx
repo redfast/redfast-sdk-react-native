@@ -91,7 +91,7 @@ export default function HomeScreen() {
         const mid = Math.floor(movies.length / 2);
         const movieRow1 = movies.slice(0, mid);
         const movieRow2 = movies.slice(mid);
-        const inlines = (await promptMgr?.getInlines('android-banner')) ?? [];
+        const inlines = (await promptMgr?.getInlines('home-banner')) ?? [];
         const rows: Row[] = [];
         if (inlines.length > 0) {
           rows.push({
