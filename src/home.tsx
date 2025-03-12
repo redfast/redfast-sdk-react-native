@@ -5,19 +5,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   useWindowDimensions,
-} from 'react-native';
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
-import type { HomeScreenNavigationProp, Movie } from './types';
-import { getAllMovies } from './utils/webflow';
-import type { ImageURISource } from 'react-native';
-import {
-  MyComponent,
-  usePrompt,
-  displayPrompt,
-  displayInlines,
-} from '@redfast/react-native-redfast';
-import type { PathItem } from '@redfast/redfast-core';
+} from "react-native";
+import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import type { HomeScreenNavigationProp, Movie } from "./types";
+import { getAllMovies } from "./utils/webflow";
+import type { ImageURISource } from "react-native";
+import { usePrompt } from "./utils/usePrompt";
+import type { PathItem } from "@redfast/redfast-core";
+import { PromptBanner } from "./utils/PromptBanner";
 
 interface Row {
   id: string;
@@ -43,12 +39,12 @@ const VideoRoll = ({
       horizontal
       renderItem={({ item }) => (
         <TouchableOpacity
-          onPress={() => navigation.navigate('MovieDetail', { movie: item })}
+          onPress={() => navigation.navigate("MovieDetail", { movie: item })}
         >
           <Image
             source={{ uri: item.hdPosterLandscape }}
             style={
-              orientation === 'landscape'
+              orientation === "landscape"
                 ? styles.movieImageLandscape
                 : styles.movieImagePortrait
             }
@@ -91,49 +87,49 @@ export default function HomeScreen() {
         const mid = Math.floor(movies.length / 2);
         const movieRow1 = movies.slice(0, mid);
         const movieRow2 = movies.slice(mid);
-        const inlines = (await promptMgr?.getInlines('home-banner')) ?? [];
+        const inlines = (await promptMgr?.getInlines("android-banner")) ?? [];
         const rows: Row[] = [];
         if (inlines.length > 0) {
           rows.push({
             id: String(rows.length),
-            type: 'banner',
-            orientation: 'landscape',
+            type: "banner",
+            orientation: "landscape",
             list: inlines,
           });
         }
         rows.push({
           id: String(rows.length),
-          type: 'highlight',
-          orientation: 'landscape',
-          list: [require('../assets/highlightd.png')],
+          type: "highlight",
+          orientation: "landscape",
+          list: [require("../assets/highlightd.png")],
         });
         rows.push({
           id: String(rows.length),
-          type: 'movie',
-          orientation: 'portrait',
+          type: "movie",
+          orientation: "portrait",
           list: movieRow1,
         });
         rows.push({
           id: String(rows.length),
-          type: 'splash',
-          orientation: 'landscape',
-          list: [require('../assets/splash.png')],
+          type: "splash",
+          orientation: "landscape",
+          list: [require("../assets/splash.png")],
         });
         rows.push({
           id: String(rows.length),
-          type: 'new',
-          orientation: 'landscape',
-          list: [require('../assets/new-release.png')],
+          type: "new",
+          orientation: "landscape",
+          list: [require("../assets/new-release.png")],
         });
         rows.push({
           id: String(rows.length),
-          type: 'movie',
-          orientation: 'landscape',
+          type: "movie",
+          orientation: "landscape",
           list: movieRow2,
         });
         setRowList(rows);
 
-        const { path, delaySeconds } = await promptMgr.onScreenChanged('home');
+        const { path, delaySeconds } = await promptMgr.onScreenChanged("home");
         if (path) {
           setTimeout(() => {
             setPathItem(path);
@@ -153,37 +149,40 @@ export default function HomeScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           switch (item.type) {
-            case 'movie':
+            case "movie":
               return (
                 <VideoRoll
                   movies={item.list as Movie[]}
                   orientation={item.orientation}
                 />
               );
-            case 'banner':
-              return displayInlines(
-                item.list as PathItem[],
-                (windowWidth * 300) / 1026,
-                (result) =>
-                  console.log(
-                    JSON.stringify({ ...result, source: 'banner' }, null, 2)
-                  )
+            case "banner":
+              return (
+                <PromptBanner
+                  pathItems={item.list as PathItem[]}
+                  height={(windowWidth * 300) / 1026}
+                  onEvent={(result) =>
+                    console.log(
+                      JSON.stringify({ ...result, source: "banner" }, null, 2)
+                    )
+                  }
+                />
               );
-            case 'highlight':
+            case "highlight":
               return (
                 <ImageRow
                   image={item.list[0] as ImageURISource}
                   height={(windowWidth * 203) / 1373}
                 />
               );
-            case 'splash':
+            case "splash":
               return (
                 <ImageRow
                   image={item.list[0] as ImageURISource}
                   height={(windowWidth * 456) / 1564}
                 />
               );
-            case 'new':
+            case "new":
               return (
                 <ImageRow
                   image={item.list[0] as ImageURISource}
@@ -196,28 +195,6 @@ export default function HomeScreen() {
         }}
         ItemSeparatorComponent={Separator}
       />
-      <TouchableOpacity
-        onPress={async () => {
-          if (promptMgr) {
-            const { path, delaySeconds } =
-              await promptMgr.onButtonClicked('clickId');
-            if (path) {
-              setTimeout(() => {
-                setPathItem(path);
-                setShowModal(true);
-              }, delaySeconds);
-            }
-            await promptMgr.customTrack('genres');
-            await promptMgr.resetGoal();
-          }
-        }}
-      >
-        <MyComponent message="Reset Prompts" />
-      </TouchableOpacity>
-      {displayPrompt(showModal, pathItem, (result) => {
-        console.log(JSON.stringify({ ...result, source: 'modal' }, null, 2));
-        setShowModal(false);
-      })}
     </View>
   );
 }
@@ -225,18 +202,18 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     paddingTop: 50,
     paddingHorizontal: 10,
   },
   header: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   imageRow: {
-    width: '100%',
+    width: "100%",
     borderRadius: 10,
   },
   movieImagePortrait: {
@@ -254,7 +231,7 @@ const styles = StyleSheet.create({
   separator: {
     // Style your separator
     height: 10, // Adjust height for spacing
-    width: '100%',
-    backgroundColor: 'transparent', // Or a color if you want a visible line
+    width: "100%",
+    backgroundColor: "transparent", // Or a color if you want a visible line
   },
 });

@@ -1,14 +1,14 @@
-import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './home';
-import MovieDetailScreen from './detail';
-import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from "@react-navigation/stack";
+import HomeScreen from "./home";
+import MovieDetailScreen from "./detail";
+import { NavigationContainer } from "@react-navigation/native";
 import {
   PromptAction_Init,
   PromptProvider,
   usePrompt,
-} from '@redfast/react-native-redfast';
-import React from 'react';
-import { PromptManager } from '@redfast/react-native-redfast';
+} from "./utils/usePrompt";
+import React from "react";
+import { PromptManager } from "./utils/PromptManager";
 
 const Stack = createStackNavigator();
 
@@ -19,8 +19,8 @@ const AppRoot: React.FC = () => {
   React.useEffect(() => {
     if (dispatch) {
       const promptMgr = new PromptManager(
-        '<YOUR_PULSE_APP_ID>',
-        '<YOUR_PULSE_USER_ID>'
+        "<YOUR_PULSE_APP_ID>",
+        "<YOUR_PULSE_USER_ID>"
       );
       const intervalId = setInterval(() => {
         if (promptMgr.isInitialized()) {

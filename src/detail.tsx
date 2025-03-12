@@ -3,7 +3,7 @@ import { useRoute } from '@react-navigation/native';
 import type { MovieDetailScreenRouteProp } from './types';
 import type { ImageURISource } from 'react-native';
 import React from 'react';
-import { usePrompt, displayPrompt } from '@redfast/react-native-redfast';
+import { usePrompt } from './utils/usePrompt';
 import type { PathItem } from '@redfast/redfast-core';
 import { PathType } from '@redfast/redfast-core';
 
@@ -97,10 +97,6 @@ export default function MovieDetailScreen() {
         renderItem={({ item: { image } }) => <Image source={image} />}
         ItemSeparatorComponent={Separator}
       />
-      {displayPrompt(showModal, pathItem, (result) => {
-        console.log(result);
-        setShowModal(false);
-      })}
     </View>
   );
 }
