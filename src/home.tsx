@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+
 import {
   View,
   FlatList,
@@ -5,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   useWindowDimensions,
+  Text,
 } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
@@ -12,10 +15,9 @@ import type { HomeScreenNavigationProp, Movie } from './types';
 import { getAllMovies } from './utils/webflow';
 import type { ImageURISource } from 'react-native';
 import {
-  MyComponent,
   usePrompt,
   displayPrompt,
-  displayInlines,
+  RedfastInline,
 } from '@redfast/react-native-redfast';
 import type { PathItem } from '@redfast/redfast-core';
 
@@ -75,6 +77,22 @@ const ImageRow = ({
   );
 };
 
+const FootNote = ({
+  message,
+  color = 'blue',
+}: {
+  message: string;
+  color: string;
+}) => {
+  return (
+    <View style={{ padding: 10, backgroundColor: '#f0f0f0' }}>
+      <Text style={[{ fontSize: 16, fontWeight: 'bold' }, { color }]}>
+        Dev: {message}
+      </Text>
+    </View>
+  );
+};
+
 export default function HomeScreen() {
   const [rowList, setRowList] = React.useState<Row[]>([]);
   const [showModal, setShowModal] = React.useState(false);
@@ -91,19 +109,17 @@ export default function HomeScreen() {
         const mid = Math.floor(movies.length / 2);
         const movieRow1 = movies.slice(0, mid);
         const movieRow2 = movies.slice(mid);
-        const inlines = (await promptMgr?.getInlines('home-banner')) ?? [];
         const rows: Row[] = [];
-        if (inlines.length > 0) {
-          rows.push({
-            id: String(rows.length),
-            type: 'banner',
-            orientation: 'landscape',
-            list: inlines,
-          });
-        }
+
         rows.push({
           id: String(rows.length),
-          type: 'highlight',
+          type: 'banner',
+          orientation: 'landscape',
+          list: [],
+        });
+        rows.push({
+          id: String(rows.length),
+          type: 'highligt',
           orientation: 'landscape',
           list: [require('../assets/highlightd.png')],
         });
@@ -161,15 +177,22 @@ export default function HomeScreen() {
                 />
               );
             case 'banner':
-              return displayInlines(
-                item.list as PathItem[],
-                (windowWidth * 300) / 1026,
-                (result) =>
-                  console.log(
-                    JSON.stringify({ ...result, source: 'banner' }, null, 2)
-                  )
+              return (
+                <RedfastInline
+                  zoneId="android-banner"
+                  closeButtonColor="#000000"
+                  closeButtonBgColor="#FFFFFF"
+                  closeButtonSize="20"
+                  timerFontSize="14"
+                  timerFontColor="#FFFFFF"
+                  onEvent={(result) =>
+                    console.log(
+                      JSON.stringify({ ...result, source: 'banner' }, null, 2)
+                    )
+                  }
+                />
               );
-            case 'highlight':
+            case 'highligt':
               return (
                 <ImageRow
                   image={item.list[0] as ImageURISource}
@@ -212,7 +235,7 @@ export default function HomeScreen() {
           }
         }}
       >
-        <MyComponent message="Reset Prompts" />
+        <FootNote message="Reset Prompts" color="blue" />
       </TouchableOpacity>
       {displayPrompt(showModal, pathItem, (result) => {
         console.log(JSON.stringify({ ...result, source: 'modal' }, null, 2));
