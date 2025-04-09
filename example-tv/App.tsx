@@ -1,18 +1,86 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { createStackNavigator } from "@react-navigation/stack";
+import HomeScreen from "./src/home";
+import MovieDetailScreen from "./src/detail";
+import { NavigationContainer } from "@react-navigation/native";
+import {
+  PromptAction_Init,
+  PromptAction_Font_Button,
+  PromptAction_Font_Timer,
+  PromptAction_Font_LegalText,
+  PromptProvider,
+  usePrompt,
+} from "@redfast/react-native-redfast";
+import React from "react";
+import { PromptManager } from "@redfast/react-native-redfast";
+import { useFonts } from "expo-font";
+
+const Stack = createStackNavigator();
+
+const AppRoot: React.FC = () => {
+  const { dispatch } = usePrompt();
+  const [isReady, setReady] = React.useState(false);
+  useFonts({
+    buttonFont: require("./assets/fonts/AllProDisplayC-Medium.ttf"),
+    otherFont: require("./assets/fonts/AllProDisplayC-Regular.ttf"),
+  });
+
+  React.useEffect(() => {
+    if (dispatch) {
+      const promptMgr = new PromptManager(
+        '<YOUR_PULSE_APP_ID>',
+        '<YOUR_PULSE_USER_ID>'
+      );
+      const intervalId = setInterval(() => {
+        if (promptMgr.isInitialized()) {
+          dispatch({
+            type: PromptAction_Init,
+            data: promptMgr,
+          });
+          dispatch({
+            type: PromptAction_Font_Button,
+            data: "buttonFont",
+          });
+          dispatch({
+            type: PromptAction_Font_Timer,
+            data: "otherFont",
+          });
+          dispatch({
+            type: PromptAction_Font_LegalText,
+            data: "otherFont",
+          });
+          setReady(true);
+          clearInterval(intervalId);
+        }
+      }, 1000);
+      return () => clearInterval(intervalId);
+    }
+    return () => {};
+  }, [dispatch]);
+
+  return (
+    <NavigationContainer>
+      {isReady && (
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MovieDetail"
+            component={MovieDetailScreen}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+      )}
+    </NavigationContainer>
+  );
+};
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-    </View>
+    <PromptProvider>
+      <AppRoot />
+    </PromptProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
