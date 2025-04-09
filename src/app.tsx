@@ -1,7 +1,7 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import HomeScreen from "./home";
-import MovieDetailScreen from "./detail";
-import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from './home';
+import MovieDetailScreen from './detail';
+import { NavigationContainer } from '@react-navigation/native';
 import {
   PromptAction_Init,
   PromptAction_Font_Button,
@@ -9,10 +9,10 @@ import {
   PromptAction_Font_LegalText,
   PromptProvider,
   usePrompt,
-} from "@redfast/react-native-redfast";
-import React from "react";
-import { PromptManager } from "@redfast/react-native-redfast";
-import { useFonts } from "expo-font";
+} from '@redfast/react-native-redfast';
+import React from 'react';
+import { PromptManager } from '@redfast/react-native-redfast';
+import { useFonts } from 'expo-font';
 
 const Stack = createStackNavigator();
 
@@ -20,8 +20,8 @@ const AppRoot: React.FC = () => {
   const { dispatch } = usePrompt();
   const [isReady, setReady] = React.useState(false);
   useFonts({
-    buttonFont: require("../assets/fonts/AllProDisplayC-Medium.ttf"),
-    otherFont: require("../assets/fonts/AllProDisplayC-Regular.ttf"),
+    buttonFont: require('../assets/fonts/AllProDisplayC-Medium.ttf'),
+    otherFont: require('../assets/fonts/AllProDisplayC-Regular.ttf'),
   });
 
   React.useEffect(() => {
@@ -38,15 +38,15 @@ const AppRoot: React.FC = () => {
           });
           dispatch({
             type: PromptAction_Font_Button,
-            data: "buttonFont",
+            data: 'buttonFont',
           });
           dispatch({
             type: PromptAction_Font_Timer,
-            data: "otherFont",
+            data: 'otherFont',
           });
           dispatch({
             type: PromptAction_Font_LegalText,
-            data: "otherFont",
+            data: 'otherFont',
           });
           setReady(true);
           clearInterval(intervalId);
@@ -56,8 +56,6 @@ const AppRoot: React.FC = () => {
     }
     return () => {};
   }, [dispatch]);
-
-  React.useEffect(() => {}, []); // Empt
 
   return (
     <NavigationContainer>
