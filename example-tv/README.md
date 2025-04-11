@@ -1,34 +1,22 @@
-# TV Example
+# Redfast React Native TV Example App
 
-Creates a project that can build for Apple TV and Android TV targets.
+Contact your Customer Success Manager to obtain the Redfast tokens in order to activate the test app. Apply the necessary changes before starting the steps below.
 
-This project uses
+## Install Redfast react native SDK packages
 
-- the [React Native TV fork](https://github.com/react-native-tvos/react-native-tvos), which supports both phone (Android and iOS) and TV (Android TV and Apple TV) targets
-- the [React Native TV config plugin](https://github.com/react-native-tvos/config-tv/tree/main/packages/config-tv) to allow Expo prebuild to modify the project's native files for TV builds
-
-## 🚀 How to use
-
-#### Creating a new project
-
-- Create a project: `npx create-expo-app -e with-tv`
-- `cd` into the project
-
-```sh
-export EXPO_TV=1
-npx expo prebuild
-yarn ios # Build for Apple TV
-yarn android # Build for Android TV
+```bash
+npm install # OR yarn install
+npm run prebuild # OR yarn prebuild
 ```
 
-> **_NOTE:_**
-> Setting the environment variable `EXPO_TV=1` enables the `@react-native-tvos/config-tv` plugin to modify the project for TV.
-> This can also be done by setting the parameter `isTV` to true in the `app.json`.
+## Run the example app
 
-#### TV specific file extensions
+```bash
+nvm use 18.18 # minimum node version
 
-This project contains an [example Metro configuration](./metro.config.js) that allows Metro to resolve application source files with TV-specific code, indicated by specific file extensions (`*.ios.tv.tsx`, `*.android.tv.tsx`, `*.tv.tsx`). This config is not enabled by default, since it will impact bundling performance, but is available for developers who need this capability.
+# for Android or FireTV run
+npm run android # or yarn android
 
-#### TV specific app icons and banners
-
-This project contains placeholder images for the Android TV banner and for Apple TV brand assets (app icon and top shelf images). The `config-tv` plugin will use these images to construct the required native image files and make the right modifications in project files. You can simply replace these images with your own app images. Note that for Apple TV, the images must be the exact sizes indicated.
+# for AppleTV run
+npm run ios # or yarn ios
+```

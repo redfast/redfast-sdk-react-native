@@ -20,12 +20,14 @@
     "android": {
       "splash": {
         "image": "./assets/images/icon-1920x720.png"
-      }
+      },
+      "package": "com.anonymous.exampletv"
     },
     "ios": {
       "splash": {
         "image": "./assets/images/icon-1920x720.png"
-      }
+      },
+      "bundleIdentifier": "com.anonymous.exampletv"
     },
     "newArchEnabled": true,
     "name": "example-tv",
