@@ -20,6 +20,7 @@ import {
   RedfastInline,
 } from '@redfast/react-native-redfast';
 import type { PathItem } from '@redfast/redfast-core';
+import { PromptResultCode } from '@redfast/redfast-core';
 
 interface Row {
   id: string;
@@ -185,11 +186,37 @@ export default function HomeScreen() {
                   closeButtonSize="20"
                   timerFontSize="14"
                   timerFontColor="#FFFFFF"
-                  onEvent={(result) =>
-                    console.log(
-                      JSON.stringify({ ...result, source: 'banner' }, null, 2)
-                    )
-                  }
+                  onEvent={(result) => {
+                    const getEventName = (code: PromptResultCode) => {
+                      switch (code) {
+                        case PromptResultCode.IMPRESSION:
+                          return 'Redfast Impression';
+                        case PromptResultCode.BUTTON1:
+                          return 'Redfast Click';
+                        case PromptResultCode.BUTTON2:
+                          return 'Redfast Click2';
+                        case PromptResultCode.BUTTON3:
+                          return 'Redfast Decline';
+                        case PromptResultCode.DISMISS:
+                          return 'Redfast Dismiss';
+                        case PromptResultCode.TIMEOUT:
+                          return 'Redfast Timeout';
+                        case PromptResultCode.HOLDOUT:
+                          return 'Redfast Holdout';
+                        default:
+                          return 'Redfast Event';
+                      }
+                    };
+
+                    const analyticsData = {
+                      name: getEventName(result.code),
+                      data: {
+                        ...result.promptMeta,
+                        timestamp: new Date().toISOString()
+                      }
+                    };
+                    console.log('ANALYTICS:', JSON.stringify(analyticsData, null, 2));
+                  }}
                 />
               );
             case 'highligt':
