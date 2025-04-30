@@ -5,7 +5,7 @@ Contact your Customer Success Manager to obtain the Redfast tokens in order to a
 ## Install Redfast react native SDK packages
 
 ```bash
-npm install # OR yarn install
+npm install --legacy-peer-deps # OR yarn install
 npm run prebuild # OR yarn prebuild
 ```
 
