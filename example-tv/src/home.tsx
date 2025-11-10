@@ -20,6 +20,7 @@ import {
   RedfastInline,
 } from '@redfast/react-native-redfast';
 import type { PathItem } from '@redfast/redfast-core';
+import { PromptResultCode } from '@redfast/redfast-core';
 
 interface Row {
   id: string;
@@ -239,7 +240,10 @@ export default function HomeScreen() {
       </TouchableOpacity>
       {displayPrompt(showModal, pathItem, (result) => {
         console.log(JSON.stringify({ ...result, source: 'modal' }, null, 2));
-        setShowModal(false);
+        const { code } = result;
+        if (code !== PromptResultCode.IMPRESSION) {
+          setShowModal(false);
+        }
       })}
     </View>
   );

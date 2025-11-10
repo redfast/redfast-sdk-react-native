@@ -266,7 +266,10 @@ export default function HomeScreen() {
       </TouchableOpacity>
       {displayPrompt(showModal, pathItem, (result) => {
         console.log(JSON.stringify({ ...result, source: 'modal' }, null, 2));
-        setShowModal(false);
+        const { code } = result;
+        if (code !== PromptResultCode.IMPRESSION) {
+          setShowModal(false);
+        }
       })}
     </View>
   );
